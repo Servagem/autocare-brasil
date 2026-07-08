@@ -1,17 +1,54 @@
-# autocare_brasil
+# 🚗 AutoCare Brasil
 
-A new Flutter project.
+Aplicativo Flutter para gerenciamento completo de veículos.
 
-## Getting Started
+## 📱 Sobre
 
-This project is a starting point for a Flutter application.
+O AutoCare Brasil foi desenvolvido para ajudar motoristas a controlar todas as informações do veículo em um único lugar.
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Funcionalidades
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- 🚗 Cadastro de veículos
+- 🔧 Controle de manutenções
+- ⛽ Controle de abastecimentos
+- 📄 Controle de documentos
+- 🔔 Lembretes automáticos
+- 📊 Dashboard com estatísticas
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🚀 Tecnologias
+
+- Flutter
+- Dart
+- Riverpod
+- GoRouter
+- SQLite
+- Git
+- GitHub
+
+## 📂 Estrutura
+
+```
+lib/
+├── app/
+├── core/
+├── features/
+├── shared/
+└── main.dart
+```
+
+## 📅 Roadmap
+
+- [x] Configuração do ambiente
+- [x] Projeto Flutter
+- [x] GitHub
+- [ ] Dashboard
+- [ ] Cadastro de veículos
+- [ ] Banco de dados
+- [ ] Manutenções
+- [ ] Abastecimentos
+- [ ] Documentos
+- [ ] Publicação na Play Store
+
+## 📄 Licença
+
+Projeto em desenvolvimento.
