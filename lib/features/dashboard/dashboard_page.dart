@@ -1,7 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
+
+  Widget buildCard(
+    IconData icon,
+    String title,
+    String subtitle,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: Colors.blue,
+          size: 32,
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.arrow_forward_ios),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,27 +47,27 @@ class DashboardPage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            _buildCard(
+            buildCard(
               Icons.directions_car,
               'Meu Veículo',
               'Nenhum veículo cadastrado',
             ),
 
-            _buildCard(
+            buildCard(
               Icons.build,
               'Manutenções',
               '0 registros',
             ),
 
-            _buildCard(
+            buildCard(
               Icons.local_gas_station,
               'Abastecimentos',
               '0 registros',
             ),
 
-            _buildCard(
+            buildCard(
               Icons.description,
               'Documentos',
               '0 documentos',
@@ -52,7 +78,9 @@ class DashboardPage extends StatelessWidget {
             SizedBox(
               height: 55,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  context.go('/vehicle');
+                },
                 icon: const Icon(Icons.add),
                 label: const Text(
                   'Adicionar Veículo',
@@ -62,21 +90,6 @@ class DashboardPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildCard(IconData icon, String title, String subtitle) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          size: 32,
-        ),
-        title: Text(title),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios),
       ),
     );
   }
