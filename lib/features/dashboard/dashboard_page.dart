@@ -1,30 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class DashboardPage extends StatelessWidget {
+import '../vehicles/models/vehicle.dart';
+import '../vehicles/repositories/vehicle_repository.dart';
+import '../vehicles/widgets/vehicle_card.dart';
+
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
-  Widget buildCard(
-    IconData icon,
-    String title,
-    String subtitle,
-  ) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: Colors.blue,
-          size: 32,
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios),
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  final VehicleRepository _repository = VehicleRepository();
+
+  List<Vehicle> vehicles = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadVehicles();
+  }
+
+  Future<void> loadVehicles() async {
+    final list = await _repository.getAll();
+
+    if (!mounted) return;
+
+    setState(() {
+      vehicles = list;
+    });
+  }
+
+  Future<void> deleteVehicle(int id) async {
+    await _repository.delete(id);
+
+    await loadVehicles();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Veículo excluído com sucesso!'),
       ),
     );
   }
@@ -33,64 +51,70 @@ class DashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AutoCare Brasil'),
+        title: const Text("AutoCare Brasil"),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            const Text(
-              'Bem-vindo!',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
 
-            const SizedBox(height: 24),
-
-            buildCard(
-              Icons.directions_car,
-              'Meu Veículo',
-              'Nenhum veículo cadastrado',
-            ),
-
-            buildCard(
-              Icons.build,
-              'Manutenções',
-              '0 registros',
-            ),
-
-            buildCard(
-              Icons.local_gas_station,
-              'Abastecimentos',
-              '0 registros',
-            ),
-
-            buildCard(
-              Icons.description,
-              'Documentos',
-              '0 documentos',
-            ),
-
-            const SizedBox(height: 30),
-
-            SizedBox(
-              height: 55,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  context.go('/vehicle');
-                },
-                icon: const Icon(Icons.add),
-                label: const Text(
-                  'Adicionar Veículo',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            ),
-          ],
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await context.push('/vehicle');
+          await loadVehicles();
+        },
+        child: const Icon(Icons.add),
       ),
+
+      body: vehicles.isEmpty
+          ? const Center(
+              child: Text(
+                "Nenhum veículo cadastrado",
+                style: TextStyle(fontSize: 18),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: vehicles.length,
+              itemBuilder: (context, index) {
+                final vehicle = vehicles[index];
+
+                return VehicleCard(
+                  vehicle: vehicle,
+
+                  onEdit: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Editar veículo (próxima etapa)"),
+                      ),
+                    );
+                  },
+
+                  onDelete: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text("Excluir veículo"),
+                        content: const Text(
+                          "Deseja realmente excluir este veículo?",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text("Cancelar"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text("Excluir"),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirm == true && vehicle.id != null) {
+                      await deleteVehicle(vehicle.id!);
+                    }
+                  },
+                );
+              },
+            ),
     );
   }
 }
