@@ -4,8 +4,10 @@ import '../features/fuel/pages/fuel_form_page.dart';
 import '../features/fuel/pages/fuel_list_page.dart';
 import '../features/home/home_page.dart';
 import '../features/splash/splash_page.dart';
-import '../features/vehicles/pages/vehicle_form_page.dart';
 
+import '../features/vehicles/models/vehicle.dart';
+import '../features/vehicles/pages/vehicle_form_page.dart';
+import '../features/vehicles/pages/vehicle_list_page.dart';
 
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,
@@ -24,9 +26,18 @@ final GoRouter appRouter = GoRouter(
     ),
 
     GoRoute(
+      path: '/vehicles',
+      name: 'vehicles',
+      builder: (context, state) => const VehicleListPage(),
+    ),
+
+    GoRoute(
       path: '/vehicle',
       name: 'vehicle',
-      builder: (context, state) => const VehicleFormPage(),
+      builder: (context, state) {
+        final vehicle = state.extra as Vehicle?;
+        return VehicleFormPage(vehicle: vehicle);
+      },
     ),
 
     GoRoute(

@@ -1,114 +1,114 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/widgets/app_card.dart';
 import '../models/vehicle.dart';
 
 class VehicleCard extends StatelessWidget {
   final Vehicle vehicle;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   const VehicleCard({
     super.key,
     required this.vehicle,
-    this.onEdit,
-    this.onDelete,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const CircleAvatar(
-                  radius: 28,
-                  child: Icon(Icons.directions_car),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                child: Icon(
+                  Icons.directions_car,
+                  size: 30,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${vehicle.brand} ${vehicle.model}",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+              ),
+
+              const SizedBox(width: 16),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${vehicle.brand} ${vehicle.model}",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Text(
-                        vehicle.plate,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                        ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      vehicle.plate.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.grey.shade700,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 18),
-                const SizedBox(width: 8),
-                Text("${vehicle.year}"),
-              ],
-            ),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              Chip(
+                avatar: const Icon(Icons.calendar_today, size: 18),
+                label: Text(vehicle.year.toString()),
+              ),
 
-            const SizedBox(height: 10),
+              Chip(
+                avatar: const Icon(Icons.palette, size: 18),
+                label: Text(vehicle.color),
+              ),
 
-            Row(
-              children: [
-                const Icon(Icons.palette, size: 18),
-                const SizedBox(width: 8),
-                Text(vehicle.color),
-              ],
-            ),
+              Chip(
+                avatar: const Icon(Icons.speed, size: 18),
+                label: Text("${vehicle.mileage} km"),
+              ),
+            ],
+          ),
 
-            const SizedBox(height: 10),
+          const Divider(height: 32),
 
-            Row(
-              children: [
-                const Icon(Icons.speed, size: 18),
-                const SizedBox(width: 8),
-                Text("${vehicle.mileage} km"),
-              ],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              OutlinedButton.icon(
+                onPressed: onEdit,
+                icon: const Icon(Icons.edit),
+                label: const Text("Editar"),
+              ),
 
-            const Divider(height: 30),
+              const SizedBox(width: 12),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: onEdit,
-                  icon: const Icon(
-                    Icons.edit,
-                    color: Colors.blue,
-                  ),
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.red,
                 ),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: const Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                onPressed: onDelete,
+                icon: const Icon(Icons.delete),
+                label: const Text("Excluir"),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

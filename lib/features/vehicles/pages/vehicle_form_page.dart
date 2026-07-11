@@ -8,7 +8,12 @@ import '../models/vehicle.dart';
 import '../repositories/vehicle_repository.dart';
 
 class VehicleFormPage extends StatefulWidget {
-  const VehicleFormPage({super.key});
+  final Vehicle? vehicle;
+
+  const VehicleFormPage({
+    super.key,
+    this.vehicle,
+  });
 
   @override
   State<VehicleFormPage> createState() => _VehicleFormPageState();
@@ -26,6 +31,22 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
 
   final VehicleRepository _repository = VehicleRepository();
 
+  bool get isEditing => widget.vehicle != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.vehicle != null) {
+      _brandController.text = widget.vehicle!.brand;
+      _modelController.text = widget.vehicle!.model;
+      _yearController.text = widget.vehicle!.year.toString();
+      _plateController.text = widget.vehicle!.plate;
+      _colorController.text = widget.vehicle!.color;
+      _mileageController.text = widget.vehicle!.mileage.toString();
+    }
+  }
+
   @override
   void dispose() {
     _brandController.dispose();
@@ -38,11 +59,10 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
   }
 
   Future<void> _saveVehicle() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final vehicle = Vehicle(
+      id: widget.vehicle?.id,
       brand: _brandController.text.trim(),
       model: _modelController.text.trim(),
       year: int.parse(_yearController.text),
@@ -51,13 +71,21 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
       mileage: int.parse(_mileageController.text),
     );
 
-    await _repository.insert(vehicle);
+    if (isEditing) {
+      await _repository.update(vehicle);
+    } else {
+      await _repository.insert(vehicle);
+    }
 
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Veículo cadastrado com sucesso!"),
+      SnackBar(
+        content: Text(
+          isEditing
+              ? "Veículo atualizado com sucesso!"
+              : "Veículo cadastrado com sucesso!",
+        ),
       ),
     );
 
@@ -67,7 +95,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: "Cadastrar Veículo",
+      title: isEditing ? "Editar Veículo" : "Cadastrar Veículo",
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -132,8 +160,8 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
               const SizedBox(height: 30),
 
               AppButton(
-                text: "Salvar Veículo",
-                icon: Icons.save,
+                text: isEditing ? "Atualizar Veículo" : "Salvar Veículo",
+                icon: isEditing ? Icons.edit : Icons.save,
                 onPressed: _saveVehicle,
               ),
             ],

@@ -1,20 +1,22 @@
-import '../../fuel/repositories/fuel_repository.dart';
-import '../../vehicles/repositories/vehicle_repository.dart';
 import '../models/dashboard_data.dart';
+import '../repositories/dashboard_repository.dart';
 
 class DashboardService {
-  final VehicleRepository _vehicleRepository = VehicleRepository();
-  final FuelRepository _fuelRepository = FuelRepository();
+  DashboardService(this.repository);
+
+  final DashboardRepository repository;
 
   Future<DashboardData> loadDashboard() async {
-    final vehicles = await _vehicleRepository.getAll();
+    final vehicles = await repository.vehicleRepository.getAll();
 
     if (vehicles.isEmpty) {
       return const DashboardData(
+        totalVehicles: 0,
+        totalRefuels: 0,
+        totalSpent: 0,
+        averageConsumption: 0,
         vehicleName: "Nenhum veículo",
         plate: "--",
-        monthlyExpense: 0,
-        averageConsumption: 0,
         lastFuelDate: "--",
         nextMaintenanceKm: 0,
       );
@@ -22,52 +24,50 @@ class DashboardService {
 
     final vehicle = vehicles.first;
 
-    final fuels = await _fuelRepository.getByVehicle(vehicle.id!);
+    final fuels =
+        await repository.fuelRepository.getByVehicle(vehicle.id!);
 
-    double monthlyExpense = 0;
+    double totalSpent = 0;
     double averageConsumption = 0;
+
     String lastFuelDate = "--";
 
-    if (fuels.isNotEmpty) {
-      final now = DateTime.now();
+    for (final fuel in fuels) {
+      totalSpent += fuel.total;
+    }
 
-      // Soma dos abastecimentos do mês
-      for (final fuel in fuels) {
-        if (fuel.date.month == now.month &&
-            fuel.date.year == now.year) {
-          monthlyExpense += fuel.total;
-        }
+    if (fuels.isNotEmpty) {
+      final last = fuels.first;
+
+      lastFuelDate =
+          "${last.date.day.toString().padLeft(2, '0')}/"
+          "${last.date.month.toString().padLeft(2, '0')}/"
+          "${last.date.year}";
+    }
+
+    if (fuels.length >= 2) {
+      double totalKm = 0;
+      double totalLiters = 0;
+
+      for (int i = 0; i < fuels.length - 1; i++) {
+        totalKm +=
+            (fuels[i].mileage - fuels[i + 1].mileage).abs();
+
+        totalLiters += fuels[i].liters;
       }
 
-      // Último abastecimento
-      lastFuelDate =
-          "${fuels.first.date.day.toString().padLeft(2, '0')}/"
-          "${fuels.first.date.month.toString().padLeft(2, '0')}/"
-          "${fuels.first.date.year}";
-
-      // Consumo médio (km/L)
-      if (fuels.length >= 2) {
-        double totalKm = 0;
-        double totalLiters = 0;
-
-        for (int i = 0; i < fuels.length - 1; i++) {
-          totalKm +=
-              (fuels[i].mileage - fuels[i + 1].mileage).abs();
-
-          totalLiters += fuels[i].liters;
-        }
-
-        if (totalLiters > 0) {
-          averageConsumption = totalKm / totalLiters;
-        }
+      if (totalLiters > 0) {
+        averageConsumption = totalKm / totalLiters;
       }
     }
 
     return DashboardData(
+      totalVehicles: vehicles.length,
+      totalRefuels: fuels.length,
+      totalSpent: totalSpent,
+      averageConsumption: averageConsumption,
       vehicleName: "${vehicle.brand} ${vehicle.model}",
       plate: vehicle.plate,
-      monthlyExpense: monthlyExpense,
-      averageConsumption: averageConsumption,
       lastFuelDate: lastFuelDate,
       nextMaintenanceKm: vehicle.mileage + 10000,
     );

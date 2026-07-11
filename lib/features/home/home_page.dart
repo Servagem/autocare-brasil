@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../dashboard/dashboard_page.dart';
 import '../fuel/pages/fuel_list_page.dart';
-import '../maintenance/pages/maintenance_page.dart';
-import '../settings/pages/settings_page.dart';
-import '../vehicles/pages/vehicles_page.dart';
+import '../vehicles/pages/vehicle_list_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,13 +14,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
 
-  final List<Widget> pages = const [
-    DashboardPage(),
-    VehiclesPage(),
-    FuelListPage(),
-    MaintenancePage(),
-    SettingsPage(),
-  ];
+  final pages = const [
+  DashboardPage(),
+  VehicleListPage(),
+  FuelListPage(),
+  Center(
+    child: Text("Manutenção"),
+  ),
+  Center(
+    child: Text("Configurações"),
+  ),
+];
 
   @override
   Widget build(BuildContext context) {

@@ -17,6 +17,26 @@ class Vehicle {
     required this.mileage,
   });
 
+  Vehicle copyWith({
+    int? id,
+    String? brand,
+    String? model,
+    int? year,
+    String? plate,
+    String? color,
+    int? mileage,
+  }) {
+    return Vehicle(
+      id: id ?? this.id,
+      brand: brand ?? this.brand,
+      model: model ?? this.model,
+      year: year ?? this.year,
+      plate: plate ?? this.plate,
+      color: color ?? this.color,
+      mileage: mileage ?? this.mileage,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
