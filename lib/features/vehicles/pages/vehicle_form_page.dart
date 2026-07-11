@@ -80,7 +80,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
           key: _formKey,
           child: ListView(
             children: [
-              TextFormField(
+              AppTextField(
                 controller: _brandController,
                 decoration: decoration('Marca'),
                 validator: (value) =>
@@ -88,7 +88,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
               ),
               const SizedBox(height: 16),
 
-              TextFormField(
+              AppTextField(
                 controller: _modelController,
                 decoration: decoration('Modelo'),
                 validator: (value) =>
@@ -96,7 +96,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
               ),
               const SizedBox(height: 16),
 
-              TextFormField(
+              AppTextField(
                 controller: _yearController,
                 decoration: decoration('Ano'),
                 keyboardType: TextInputType.number,
@@ -105,7 +105,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
               ),
               const SizedBox(height: 16),
 
-              TextFormField(
+              AppTextField(
                 controller: _plateController,
                 decoration: decoration('Placa'),
                 validator: (value) =>
@@ -113,7 +113,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
               ),
               const SizedBox(height: 16),
 
-              TextFormField(
+              AppTextField(
                 controller: _colorController,
                 decoration: decoration('Cor'),
                 validator: (value) =>
@@ -121,7 +121,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
               ),
               const SizedBox(height: 16),
 
-              TextFormField(
+              AppTextField(
                 controller: _mileageController,
                 decoration: decoration('Quilometragem'),
                 keyboardType: TextInputType.number,
@@ -134,7 +134,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
 
               SizedBox(
                 height: 55,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: _saveVehicle,
                   child: const Text('Salvar'),
                 ),

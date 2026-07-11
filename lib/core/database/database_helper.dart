@@ -20,12 +20,28 @@ class DatabaseHelper {
 
     return openDatabase(
       join(dbPath, 'autocare_brasil.db'),
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    await _createVehiclesTable(db);
+    await _createFuelTable(db);
+  }
+
+  Future<void> _onUpgrade(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 2) {
+      await _createFuelTable(db);
+    }
+  }
+
+  Future<void> _createVehiclesTable(Database db) async {
     await db.execute('''
       CREATE TABLE vehicles(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,6 +51,23 @@ class DatabaseHelper {
         plate TEXT NOT NULL,
         color TEXT NOT NULL,
         mileage INTEGER NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _createFuelTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE fuel_records(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        vehicle_id INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        fuel_type TEXT NOT NULL,
+        liters REAL NOT NULL,
+        total_value REAL NOT NULL,
+        odometer INTEGER NOT NULL,
+        station TEXT,
+        notes TEXT,
+        FOREIGN KEY(vehicle_id) REFERENCES vehicles(id)
       )
     ''');
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'router.dart';
-import 'theme.dart';
+import '../core/theme/app_theme.dart';
 
 class AutoCareApp extends StatelessWidget {
   const AutoCareApp({super.key});
