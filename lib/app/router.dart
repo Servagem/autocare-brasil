@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/dashboard/dashboard_page.dart';
 import '../features/fuel/pages/fuel_form_page.dart';
 import '../features/fuel/pages/fuel_list_page.dart';
+import '../features/home/home_page.dart';
 import '../features/splash/splash_page.dart';
 import '../features/vehicles/pages/vehicle_form_page.dart';
-import '../features/home/home_page.dart';
+
 
 final GoRouter appRouter = GoRouter(
   debugLogDiagnostics: true,

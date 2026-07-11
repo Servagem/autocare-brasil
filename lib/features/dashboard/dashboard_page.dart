@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../vehicles/models/vehicle.dart';
-import '../vehicles/repositories/vehicle_repository.dart';
-import '../vehicles/widgets/vehicle_card.dart';
+import '../../core/widgets/app_card.dart';
+import '../../core/widgets/info_card.dart';
+import 'models/dashboard_data.dart';
+import 'services/dashboard_service.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -13,108 +14,192 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final VehicleRepository _repository = VehicleRepository();
+  final DashboardService _service = DashboardService();
 
-  List<Vehicle> vehicles = [];
+  DashboardData? dashboard;
+
+  bool loading = true;
 
   @override
   void initState() {
     super.initState();
-    loadVehicles();
+    loadDashboard();
   }
 
-  Future<void> loadVehicles() async {
-    final list = await _repository.getAll();
+  Future<void> loadDashboard() async {
+    final data = await _service.loadDashboard();
 
     if (!mounted) return;
 
     setState(() {
-      vehicles = list;
+      dashboard = data;
+      loading = false;
     });
-  }
-
-  Future<void> deleteVehicle(int id) async {
-    await _repository.delete(id);
-
-    await loadVehicles();
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Veículo excluído com sucesso!'),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (loading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("AutoCare Brasil"),
-        centerTitle: true,
       ),
 
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await context.push('/vehicle');
-          await loadVehicles();
+          await loadDashboard();
         },
         child: const Icon(Icons.add),
       ),
 
-      body: vehicles.isEmpty
-          ? const Center(
-              child: Text(
-                "Nenhum veículo cadastrado",
-                style: TextStyle(fontSize: 18),
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: vehicles.length,
-              itemBuilder: (context, index) {
-                final vehicle = vehicles[index];
+      body: RefreshIndicator(
+        onRefresh: loadDashboard,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            AppCard(
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    child: Icon(
+                      Icons.directions_car,
+                      size: 30,
+                    ),
+                  ),
 
-                return VehicleCard(
-                  vehicle: vehicle,
+                  const SizedBox(width: 16),
 
-                  onEdit: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Editar veículo (próxima etapa)"),
-                      ),
-                    );
-                  },
-
-                  onDelete: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                        title: const Text("Excluir veículo"),
-                        content: const Text(
-                          "Deseja realmente excluir este veículo?",
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          dashboard!.vehicleName,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text("Cancelar"),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text("Excluir"),
-                          ),
-                        ],
-                      ),
-                    );
 
-                    if (confirm == true && vehicle.id != null) {
-                      await deleteVehicle(vehicle.id!);
-                    }
-                  },
-                );
-              },
+                        const SizedBox(height: 4),
+
+                        Text(
+                          dashboard!.plate,
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
+
+            const SizedBox(height: 20),
+
+            Row(
+              children: [
+                Expanded(
+                  child: InfoCard(
+                    icon: Icons.local_gas_station,
+                    title: "Consumo",
+                    value:
+                        "${dashboard!.averageConsumption.toStringAsFixed(1)} km/L",
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: InfoCard(
+                    icon: Icons.attach_money,
+                    title: "Gasto do mês",
+                    value:
+                        "R\$ ${dashboard!.monthlyExpense.toStringAsFixed(2)}",
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Expanded(
+                  child: InfoCard(
+                    icon: Icons.build,
+                    title: "Próxima revisão",
+                    value: "${dashboard!.nextMaintenanceKm} km",
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: InfoCard(
+                    icon: Icons.calendar_today,
+                    title: "Último abastecimento",
+                    value: dashboard!.lastFuelDate,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 30),
+
+            const Text(
+              "Resumo",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Em breve",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  const Text("• Últimos abastecimentos"),
+
+                  const SizedBox(height: 8),
+
+                  const Text("• Gráfico de consumo"),
+
+                  const SizedBox(height: 8),
+
+                  const Text("• Gasto mensal"),
+
+                  const SizedBox(height: 8),
+
+                  const Text("• Próximas manutenções"),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

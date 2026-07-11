@@ -13,6 +13,17 @@ class FuelRepository {
     );
   }
 
+  Future<List<FuelRecord>> getAll() async {
+    final db = await _databaseHelper.database;
+
+    final result = await db.query(
+      'fuel_records',
+      orderBy: 'date DESC',
+    );
+
+    return result.map((e) => FuelRecord.fromMap(e)).toList();
+  }
+
   Future<List<FuelRecord>> getByVehicle(int vehicleId) async {
     final db = await _databaseHelper.database;
 
@@ -20,10 +31,26 @@ class FuelRepository {
       'fuel_records',
       where: 'vehicle_id = ?',
       whereArgs: [vehicleId],
-      orderBy: 'odometer DESC',
+      orderBy: 'date DESC',
     );
 
     return result.map((e) => FuelRecord.fromMap(e)).toList();
+  }
+
+  Future<FuelRecord?> getLastFuel(int vehicleId) async {
+    final db = await _databaseHelper.database;
+
+    final result = await db.query(
+      'fuel_records',
+      where: 'vehicle_id = ?',
+      whereArgs: [vehicleId],
+      orderBy: 'date DESC',
+      limit: 1,
+    );
+
+    if (result.isEmpty) return null;
+
+    return FuelRecord.fromMap(result.first);
   }
 
   Future<int> update(FuelRecord record) async {

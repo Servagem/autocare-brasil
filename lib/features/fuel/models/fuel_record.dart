@@ -1,37 +1,37 @@
 class FuelRecord {
   final int? id;
   final int vehicleId;
-  final String date;
+  final DateTime date;
+  final String station;
   final String fuelType;
+  final int mileage;
   final double liters;
-  final double totalValue;
-  final int odometer;
-  final String? station;
-  final String? notes;
+  final double pricePerLiter;
+  final double total;
 
   FuelRecord({
     this.id,
     required this.vehicleId,
     required this.date,
+    required this.station,
     required this.fuelType,
+    required this.mileage,
     required this.liters,
-    required this.totalValue,
-    required this.odometer,
-    this.station,
-    this.notes,
+    required this.pricePerLiter,
+    required this.total,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'vehicle_id': vehicleId,
-      'date': date,
-      'fuel_type': fuelType,
-      'liters': liters,
-      'total_value': totalValue,
-      'odometer': odometer,
+      'date': date.toIso8601String(),
       'station': station,
-      'notes': notes,
+      'fuel_type': fuelType,
+      'mileage': mileage,
+      'liters': liters,
+      'price_per_liter': pricePerLiter,
+      'total': total,
     };
   }
 
@@ -39,13 +39,13 @@ class FuelRecord {
     return FuelRecord(
       id: map['id'],
       vehicleId: map['vehicle_id'],
-      date: map['date'],
-      fuelType: map['fuel_type'],
-      liters: map['liters'].toDouble(),
-      totalValue: map['total_value'].toDouble(),
-      odometer: map['odometer'],
+      date: DateTime.parse(map['date']),
       station: map['station'],
-      notes: map['notes'],
+      fuelType: map['fuel_type'],
+      mileage: map['mileage'],
+      liters: (map['liters'] as num).toDouble(),
+      pricePerLiter: (map['price_per_liter'] as num).toDouble(),
+      total: (map['total'] as num).toDouble(),
     );
   }
 }

@@ -1,7 +1,11 @@
-import 'package:autocare_brasil/features/vehicles/models/vehicle.dart';
-import 'package:autocare_brasil/features/vehicles/repositories/vehicle_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/app_text_field.dart';
+import '../models/vehicle.dart';
+import '../repositories/vehicle_repository.dart';
 
 class VehicleFormPage extends StatefulWidget {
   const VehicleFormPage({super.key});
@@ -20,7 +24,7 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
   final _colorController = TextEditingController();
   final _mileageController = TextEditingController();
 
-  final _repository = VehicleRepository();
+  final VehicleRepository _repository = VehicleRepository();
 
   @override
   void dispose() {
@@ -28,52 +32,42 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
     _modelController.dispose();
     _yearController.dispose();
     _plateController.dispose();
-    _yearController.dispose();
-    _plateController.dispose();
     _colorController.dispose();
     _mileageController.dispose();
     super.dispose();
   }
 
-  InputDecoration decoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-    );
-  }
-
   Future<void> _saveVehicle() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
     final vehicle = Vehicle(
       brand: _brandController.text.trim(),
       model: _modelController.text.trim(),
-      year: int.tryParse(_yearController.text) ?? 0,
+      year: int.parse(_yearController.text),
       plate: _plateController.text.trim(),
       color: _colorController.text.trim(),
-      mileage: int.tryParse(_mileageController.text) ?? 0,
+      mileage: int.parse(_mileageController.text),
     );
 
     await _repository.insert(vehicle);
 
     if (!mounted) return;
 
-    // Em vez de pop(), navega diretamente para o Dashboard
-    context.go('/dashboard');
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Veículo cadastrado com sucesso!'),
+        content: Text("Veículo cadastrado com sucesso!"),
       ),
     );
+
+    context.go('/dashboard');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cadastrar Veículo'),
-      ),
+    return AppScaffold(
+      title: "Cadastrar Veículo",
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -82,62 +76,65 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
             children: [
               AppTextField(
                 controller: _brandController,
-                decoration: decoration('Marca'),
+                label: "Marca",
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Informe a marca' : null,
+                    value == null || value.isEmpty ? "Informe a marca" : null,
               ),
+
               const SizedBox(height: 16),
 
               AppTextField(
                 controller: _modelController,
-                decoration: decoration('Modelo'),
+                label: "Modelo",
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Informe o modelo' : null,
+                    value == null || value.isEmpty ? "Informe o modelo" : null,
               ),
+
               const SizedBox(height: 16),
 
               AppTextField(
                 controller: _yearController,
-                decoration: decoration('Ano'),
+                label: "Ano",
                 keyboardType: TextInputType.number,
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Informe o ano' : null,
+                    value == null || value.isEmpty ? "Informe o ano" : null,
               ),
+
               const SizedBox(height: 16),
 
               AppTextField(
                 controller: _plateController,
-                decoration: decoration('Placa'),
+                label: "Placa",
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Informe a placa' : null,
+                    value == null || value.isEmpty ? "Informe a placa" : null,
               ),
+
               const SizedBox(height: 16),
 
               AppTextField(
                 controller: _colorController,
-                decoration: decoration('Cor'),
+                label: "Cor",
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Informe a cor' : null,
+                    value == null || value.isEmpty ? "Informe a cor" : null,
               ),
+
               const SizedBox(height: 16),
 
               AppTextField(
                 controller: _mileageController,
-                decoration: decoration('Quilometragem'),
+                label: "Quilometragem",
                 keyboardType: TextInputType.number,
                 validator: (value) => value == null || value.isEmpty
-                    ? 'Informe a quilometragem'
+                    ? "Informe a quilometragem"
                     : null,
               ),
 
               const SizedBox(height: 30),
 
-              SizedBox(
-                height: 55,
-                child: AppButton(
-                  onPressed: _saveVehicle,
-                  child: const Text('Salvar'),
-                ),
+              AppButton(
+                text: "Salvar Veículo",
+                icon: Icons.save,
+                onPressed: _saveVehicle,
               ),
             ],
           ),
