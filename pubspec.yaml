@@ -28,7 +28,7 @@ dependencies:
   intl: ^0.20.3
 
   # Gráficos
-  fl_chart: ^1.1.0
+  fl_chart: ^1.2.0
 
   # Ícones
   font_awesome_flutter: ^10.10.0
